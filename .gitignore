@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+
+# Secrets: only .env.example is tracked
+.env
+.env.*
+!.env.example
+
+# Local-only artifacts
+.omc/
+spike/
+spike-report.md
