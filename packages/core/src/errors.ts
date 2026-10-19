@@ -56,3 +56,16 @@ export class StorageError extends SyncError {
     super('storage', message, options);
   }
 }
+
+export type CatalogErrorCode = 'network' | 'auth' | 'not-found' | 'rate-limited';
+
+/** Failure of a CatalogProvider call. Separate from SyncError: the catalog is not part of sync. */
+export class CatalogError extends Error {
+  readonly code: CatalogErrorCode;
+
+  constructor(code: CatalogErrorCode, message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = 'CatalogError';
+    this.code = code;
+  }
+}

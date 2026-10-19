@@ -1,1 +1,91 @@
-{}
+{
+  "app": { "title": "Movie Watchlist" },
+  "nav": { "list": "My list", "search": "Search", "settings": "Settings" },
+  "tmdb": {
+    "attribution": "This product uses the TMDB API but is not endorsed or certified by TMDB."
+  },
+  "common": { "loading": "Loading…" },
+  "mediaType": { "movie": "Movie", "tv": "Series" },
+  "status": { "want": "Want to watch", "watching": "Watching", "watched": "Watched" },
+  "list": {
+    "title": "My list",
+    "searchLabel": "Search the list",
+    "searchPlaceholder": "Title, source or note",
+    "filterLabel": "Filter by status",
+    "filterAll": "All statuses",
+    "sortLabel": "Sort by",
+    "sort": { "addedAt": "Date added", "title": "Title", "rating": "Rating" },
+    "empty": "Your list is empty. Find something in Search.",
+    "ratingBadge": "★ {{rating}}",
+    "emptyFiltered": "Nothing matches the current filters."
+  },
+  "search": {
+    "title": "Search",
+    "label": "Search movies and series",
+    "placeholder": "Type a title",
+    "keyMissing": "A TMDB API key is required for search. Add it in",
+    "noResults": "No results.",
+    "inList": "In your list",
+    "add": "Add to list"
+  },
+  "details": {
+    "back": "← Back to list",
+    "add": "Add to list",
+    "tmdbRating": "TMDB",
+    "savedCopy": "Showing the saved copy."
+  },
+  "editor": {
+    "status": "Status",
+    "rating": "Your rating",
+    "ratingNone": "No rating",
+    "source": "Recommended by",
+    "note": "Note",
+    "save": "Save",
+    "saved": "Saved",
+    "remove": "Remove from list",
+    "removeConfirm": "Remove this title?",
+    "removeYes": "Yes, remove",
+    "cancel": "Cancel"
+  },
+  "settings": {
+    "title": "Settings",
+    "save": "Save",
+    "saved": "Saved",
+    "language": { "title": "Language", "ru": "Русский", "en": "English" },
+    "tmdb": {
+      "title": "TMDB",
+      "key": "TMDB API key or read access token",
+      "keyHint": "Stored only on this device. A key inside a client app is not secret.",
+      "advanced": "Advanced",
+      "apiBaseUrl": "API base URL",
+      "imageBaseUrl": "Image base URL",
+      "httpsOnly": "Base URLs must start with https:// and contain no query or fragment."
+    },
+    "data": {
+      "title": "Export and import",
+      "hint": "Import merges the file into your list; it never replaces your data.",
+      "export": "Export JSON",
+      "import": "Import JSON",
+      "importDone": "Imported {{total}} entries, {{changed}} changed in your list."
+    }
+  },
+  "errors": {
+    "unknown": "Something went wrong.",
+    "catalog": {
+      "auth": "TMDB rejected the API key, or it is missing. Check it in Settings.",
+      "notFound": "This title was not found on TMDB.",
+      "rateLimited": "TMDB is rate limiting requests. Try again in a moment.",
+      "network": "Could not reach TMDB. Check your connection."
+    },
+    "schema": {
+      "newerVersion": "This file was created by a newer version of the app.",
+      "invalid": "This file is not a valid watchlist file."
+    },
+    "sync": {
+      "network": "Could not reach the sync server.",
+      "auth": "The sync server rejected the credentials.",
+      "conflict": "The remote file keeps changing. Try again.",
+      "storage": "Could not update local storage."
+    }
+  }
+}
