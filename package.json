@@ -10,7 +10,8 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "lint": "eslint .",
     "test": "vitest run",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:e2e": "pnpm --filter @movie-watchlist/desktop test:e2e"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

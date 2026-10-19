@@ -8,6 +8,8 @@ import {
   type SettingsStore,
   type TmdbConfig,
 } from './settings/settings';
+import type { SyncService } from './sync/SyncService';
+import type { SyncSettingsApi } from './sync/syncSettingsApi';
 
 export interface Services {
   repo: EntryRepository;
@@ -16,6 +18,8 @@ export interface Services {
   settings: SettingsStore;
   /** `VITE_TMDB_API_KEY` from `.env`, used when the settings field is empty. */
   tmdbEnvKey: string;
+  /** Present only on platforms with a sync backend (the Electron shell, later Android). */
+  sync?: { service: SyncService; settings: SyncSettingsApi };
 }
 
 const ServicesContext = createContext<Services | null>(null);

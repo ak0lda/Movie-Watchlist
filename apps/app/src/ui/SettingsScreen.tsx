@@ -11,6 +11,7 @@ import {
   normalizeBaseUrl,
 } from '../settings/settings';
 import { downloadText } from './download';
+import { SyncSettings } from './SyncSettings';
 
 type Notice = { kind: 'ok' | 'error'; text: string } | null;
 
@@ -120,6 +121,8 @@ export function SettingsScreen() {
           )}
         </div>
       </form>
+
+      <SyncSettings />
 
       <h2>{t('settings.data.title')}</h2>
       <p className="muted">{t('settings.data.hint')}</p>

@@ -1,3 +1,4 @@
+import { SyncEngine } from '@movie-watchlist/core';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
@@ -9,6 +10,10 @@ import { EntryRepository } from './data/repository';
 import './i18n';
 import { ServicesProvider, type Services } from './services';
 import { SettingsStore, resolveTmdbConfig } from './settings/settings';
+import { getDesktopApi } from './sync/desktopApi';
+import { IpcSyncProvider } from './sync/IpcSyncProvider';
+import { SyncService } from './sync/SyncService';
+import { createSyncSettingsApi } from './sync/syncSettingsApi';
 import './styles.css';
 
 const container = document.getElementById('root');
@@ -27,6 +32,17 @@ const services: Services = {
   settings,
   tmdbEnvKey,
 };
+
+const desktop = getDesktopApi();
+if (desktop) {
+  const engine = new SyncEngine({
+    provider: new IpcSyncProvider(desktop.sync),
+    store: services.repo,
+  });
+  const service = new SyncService(engine);
+  services.sync = { service, settings: createSyncSettingsApi(desktop.sync) };
+  service.start(document, desktop.onWindowHidden);
+}
 
 void requestPersistence();
 

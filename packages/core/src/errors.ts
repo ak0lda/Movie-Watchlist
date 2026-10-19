@@ -1,5 +1,5 @@
 /** Stable codes; the UI maps them to translation keys. */
-export type SyncErrorCode = 'network' | 'auth' | 'conflict' | 'schema' | 'storage';
+export type SyncErrorCode = 'network' | 'auth' | 'conflict' | 'schema' | 'storage' | 'config';
 
 export class SyncError extends Error {
   readonly code: SyncErrorCode;
@@ -54,6 +54,13 @@ export class SchemaError extends SyncError {
 export class StorageError extends SyncError {
   constructor(message = 'Local storage failed', options?: ErrorOptions) {
     super('storage', message, options);
+  }
+}
+
+/** Sync is not configured, the configuration is invalid, or the server cannot support safe writes. */
+export class ConfigError extends SyncError {
+  constructor(message = 'Sync is not configured correctly', options?: ErrorOptions) {
+    super('config', message, options);
   }
 }
 

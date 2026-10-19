@@ -1,5 +1,8 @@
 import {
   CatalogError,
+  type SyncConfigInput,
+  type SyncConfigView,
+  type SyncOutcome,
   type CatalogDetails,
   type CatalogItem,
   type CatalogProvider,
@@ -10,6 +13,8 @@ import { MetaCache } from '../data/metaCache';
 import { EntryRepository } from '../data/repository';
 import type { Services } from '../services';
 import { SettingsStore } from '../settings/settings';
+import { SyncService, type SyncRunner } from '../sync/SyncService';
+import type { SyncSettingsApi } from '../sync/syncSettingsApi';
 
 export const T0 = new Date('2026-10-19T12:00:00.000Z');
 
@@ -58,10 +63,63 @@ export class FakeCatalog implements CatalogProvider {
   }
 }
 
+/** Controllable sync runner: resolves immediately unless `gate` is set. */
+export class FakeRunner implements SyncRunner {
+  calls = 0;
+  error: unknown;
+  gate: Promise<void> | undefined;
+
+  async sync(): Promise<SyncOutcome> {
+    this.calls += 1;
+    await this.gate;
+    if (this.error !== undefined) throw this.error;
+    return { uploaded: true, attempts: 1 };
+  }
+}
+
+/** In-memory stand-in for the Electron settings bridge (the password is write-only). */
+export class FakeSyncSettings implements SyncSettingsApi {
+  config: SyncConfigView = {
+    serverUrl: 'https://webdav.yandex.ru',
+    filePath: '/Apps/MovieWatchlist/movies.json',
+    login: '',
+    hasPassword: false,
+  };
+  saves: SyncConfigInput[] = [];
+  clears = 0;
+  error: unknown;
+
+  getConfig(): Promise<SyncConfigView> {
+    return this.error === undefined
+      ? Promise.resolve({ ...this.config })
+      : Promise.reject(this.error);
+  }
+
+  saveConfig(input: SyncConfigInput): Promise<SyncConfigView> {
+    this.saves.push(input);
+    if (this.error !== undefined) return Promise.reject(this.error);
+    this.config = {
+      serverUrl: input.serverUrl,
+      filePath: input.filePath,
+      login: input.login,
+      hasPassword: this.config.hasPassword || Boolean(input.password),
+    };
+    return Promise.resolve({ ...this.config });
+  }
+
+  clearPassword(): Promise<SyncConfigView> {
+    this.clears += 1;
+    this.config = { ...this.config, hasPassword: false };
+    return Promise.resolve({ ...this.config });
+  }
+}
+
 let dbCounter = 0;
 
 /** Fresh isolated Dexie database (fake-indexeddb) plus every service the UI needs. */
-export function createTestServices(options: { now?: () => Date; tmdbKey?: string } = {}) {
+export function createTestServices(
+  options: { now?: () => Date; tmdbKey?: string; sync?: boolean } = {},
+) {
   dbCounter += 1;
   const db = new WatchlistDb(`test-db-${dbCounter}`);
   const now = options.now ?? (() => T0);
@@ -75,5 +133,9 @@ export function createTestServices(options: { now?: () => Date; tmdbKey?: string
     settings,
     tmdbEnvKey: '',
   };
-  return { db, catalog, settings, services };
+  const runner = new FakeRunner();
+  const syncSettings = new FakeSyncSettings();
+  const syncService = new SyncService(runner, () => now().getTime());
+  if (options.sync) services.sync = { service: syncService, settings: syncSettings };
+  return { db, catalog, settings, services, runner, syncSettings, syncService };
 }

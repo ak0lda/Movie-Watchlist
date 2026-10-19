@@ -4,6 +4,7 @@ import { DetailsScreen } from './ui/DetailsScreen';
 import { ListScreen } from './ui/ListScreen';
 import { SearchScreen } from './ui/SearchScreen';
 import { SettingsScreen } from './ui/SettingsScreen';
+import { SyncButton } from './ui/SyncButton';
 
 const NAV: { route: Route; labelKey: string }[] = [
   { route: { name: 'list' }, labelKey: 'nav.list' },
@@ -30,6 +31,7 @@ export function App() {
             </a>
           ))}
         </nav>
+        <SyncButton />
       </header>
       <main>
         {route.name === 'list' && <ListScreen />}

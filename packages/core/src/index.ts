@@ -6,3 +6,6 @@ export * from './syncEngine';
 export * from './syncFile';
 export * from './timestamp';
 export * from './types';
+export * from './base64';
+export * from './desktopBridge';
+export * from './webdav';

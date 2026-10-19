@@ -29,6 +29,8 @@ export function errorKey(error: unknown): string {
         return 'errors.sync.conflict';
       case 'storage':
         return 'errors.sync.storage';
+      case 'config':
+        return 'errors.sync.config';
       case 'schema':
         return 'errors.schema.invalid';
     }

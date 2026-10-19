@@ -1,12 +1,27 @@
 {
-  "app": { "title": "Movie Watchlist" },
-  "nav": { "list": "My list", "search": "Search", "settings": "Settings" },
+  "app": {
+    "title": "Movie Watchlist"
+  },
+  "nav": {
+    "list": "My list",
+    "search": "Search",
+    "settings": "Settings"
+  },
   "tmdb": {
     "attribution": "This product uses the TMDB API but is not endorsed or certified by TMDB."
   },
-  "common": { "loading": "Loading…" },
-  "mediaType": { "movie": "Movie", "tv": "Series" },
-  "status": { "want": "Want to watch", "watching": "Watching", "watched": "Watched" },
+  "common": {
+    "loading": "Loading…"
+  },
+  "mediaType": {
+    "movie": "Movie",
+    "tv": "Series"
+  },
+  "status": {
+    "want": "Want to watch",
+    "watching": "Watching",
+    "watched": "Watched"
+  },
   "list": {
     "title": "My list",
     "searchLabel": "Search the list",
@@ -14,7 +29,11 @@
     "filterLabel": "Filter by status",
     "filterAll": "All statuses",
     "sortLabel": "Sort by",
-    "sort": { "addedAt": "Date added", "title": "Title", "rating": "Rating" },
+    "sort": {
+      "addedAt": "Date added",
+      "title": "Title",
+      "rating": "Rating"
+    },
     "empty": "Your list is empty. Find something in Search.",
     "ratingBadge": "★ {{rating}}",
     "emptyFiltered": "Nothing matches the current filters."
@@ -51,7 +70,11 @@
     "title": "Settings",
     "save": "Save",
     "saved": "Saved",
-    "language": { "title": "Language", "ru": "Русский", "en": "English" },
+    "language": {
+      "title": "Language",
+      "ru": "Русский",
+      "en": "English"
+    },
     "tmdb": {
       "title": "TMDB",
       "key": "TMDB API key or read access token",
@@ -85,7 +108,29 @@
       "network": "Could not reach the sync server.",
       "auth": "The sync server rejected the credentials.",
       "conflict": "The remote file keeps changing. Try again.",
-      "storage": "Could not update local storage."
+      "storage": "Could not update local storage.",
+      "config": "Sync is not set up correctly. Check that the server URL starts with https://, the path is absolute, and the login and password are saved."
+    }
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing…",
+    "synced": "Synchronized",
+    "settings": {
+      "title": "Sync (WebDAV)",
+      "serverUrl": "Server URL",
+      "filePath": "File path on the server",
+      "login": "Login",
+      "password": "App password",
+      "passwordSaved": "Saved. Leave empty to keep it",
+      "passwordHint": "Use an app password from your WebDAV provider. It is stored encrypted on this device and is never shown again.",
+      "save": "Save sync settings",
+      "saved": "Sync settings saved",
+      "forgetPassword": "Forget password",
+      "passwordForgotten": "Password removed from this device",
+      "passwordRequired": "Enter the password: it is required for a new server or login.",
+      "loginRequired": "Enter your login.",
+      "pathInvalid": "The file path must start with / and point to a file."
     }
   }
 }

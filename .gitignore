@@ -13,3 +13,7 @@ coverage/
 .omc/
 spike/
 spike-report.md
+
+# Playwright output
+test-results/
+playwright-report/

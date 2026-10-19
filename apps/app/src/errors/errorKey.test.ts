@@ -1,6 +1,7 @@
 import {
   AuthError,
   CatalogError,
+  ConfigError,
   ConflictError,
   NetworkError,
   SchemaError,
@@ -28,6 +29,7 @@ const CASES: [string, unknown, string][] = [
   ['sync auth', new AuthError(), 'errors.sync.auth'],
   ['sync conflict', new ConflictError(), 'errors.sync.conflict'],
   ['sync storage', new StorageError(), 'errors.sync.storage'],
+  ['sync config', new ConfigError(), 'errors.sync.config'],
   ['plain error', new Error('boom'), 'errors.unknown'],
   ['non-error', 'boom', 'errors.unknown'],
 ];
