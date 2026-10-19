@@ -15,12 +15,24 @@ type SearchOutcome = { requestKey: string } & (
 
 export const SEARCH_DEBOUNCE_MS = 400;
 
-export function SearchScreen({ debounceMs = SEARCH_DEBOUNCE_MS }: { debounceMs?: number }) {
+interface SearchScreenProps {
+  debounceMs?: number;
+  /** Text to search for right away (a title shared from another app). */
+  initialQuery?: string;
+  /** A share arrived but contained no recognisable title. */
+  shareNotFound?: boolean;
+}
+
+export function SearchScreen({
+  debounceMs = SEARCH_DEBOUNCE_MS,
+  initialQuery = '',
+  shareNotFound = false,
+}: SearchScreenProps) {
   const { t, i18n } = useTranslation();
   const services = useServices();
   const { repo, catalog } = services;
   const config = useTmdbConfig();
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialQuery);
   const debounced = useDebouncedValue(text.trim(), debounceMs);
   const [outcome, setOutcome] = useState<SearchOutcome | null>(null);
   const [addingId, setAddingId] = useState<string | null>(null);
@@ -75,6 +87,7 @@ export function SearchScreen({ debounceMs = SEARCH_DEBOUNCE_MS }: { debounceMs?:
         onChange={(event) => setText(event.target.value)}
       />
 
+      {shareNotFound && text === '' && <p role="status">{t('search.shareNotFound')}</p>}
       {!hasKey && (
         <p role="alert">
           {t('search.keyMissing')} <a href={routeHref({ name: 'settings' })}>{t('nav.settings')}</a>

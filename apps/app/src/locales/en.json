@@ -45,7 +45,8 @@
     "keyMissing": "A TMDB API key is required for search. Add it in",
     "noResults": "No results.",
     "inList": "In your list",
-    "add": "Add to list"
+    "add": "Add to list",
+    "shareNotFound": "Could not find a title in the shared text. Type it below."
   },
   "details": {
     "back": "← Back to list",

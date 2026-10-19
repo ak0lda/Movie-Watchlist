@@ -13,6 +13,8 @@ import './i18n';
 import { startPlatformSync } from './platform';
 import { WebDavHttp } from './platform/native/webDavHttp';
 import { ServicesProvider, type Services } from './services';
+import { startShareHandling } from './share/shareService';
+import { ShareTarget } from './share/shareTarget';
 import { SettingsStore, resolveTmdbConfig } from './settings/settings';
 import { getDesktopApi } from './sync/desktopApi';
 import './styles.css';
@@ -53,6 +55,13 @@ const sync = startPlatformSync(
   services.repo,
 );
 if (sync) services.sync = sync;
+
+// "Share" from other Android apps opens the search screen with the shared title.
+if (Capacitor.getPlatform() === 'android') {
+  startShareHandling(ShareTarget, (href) => {
+    window.location.hash = href;
+  });
+}
 
 void requestPersistence();
 

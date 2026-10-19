@@ -36,6 +36,12 @@ cd apps/app/android && ./gradlew testDebugUnitTest assembleDebug
 # -> apps/app/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
+**Share to the app.** Sharing text from another Android app (Kinopoisk, Telegram, a browser) opens the search
+screen with the title filled in. The text is parsed by `apps/app/src/share/parseSharedText.ts`
+("Смотри Дюна https://…" -> "Дюна": URLs, calls to action, the source service and a year in parentheses are
+dropped; a quoted title wins). The native `ShareTarget` plugin accepts `text/plain` only and retains the event
+until JS subscribes, so a share that launches the app is not lost.
+
 Network access on Android goes through the app's own `WebDavHttp` plugin (OkHttp), because `CapacitorHttp`
 (`HttpURLConnection`) cannot send WebDAV verbs such as `MKCOL`. The sync password is kept in the Android
 Keystore through `@aparajita/capacitor-secure-storage`; backups are disabled so it cannot be restored elsewhere.

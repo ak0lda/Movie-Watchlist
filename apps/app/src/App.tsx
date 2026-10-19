@@ -35,7 +35,14 @@ export function App() {
       </header>
       <main>
         {route.name === 'list' && <ListScreen />}
-        {route.name === 'search' && <SearchScreen />}
+        {route.name === 'search' && (
+          <SearchScreen
+            // A new share replaces the text even if the search screen is already open.
+            key={`${route.query ?? ''}|${route.notFound ? 1 : 0}`}
+            initialQuery={route.query ?? ''}
+            shareNotFound={route.notFound === true}
+          />
+        )}
         {route.name === 'settings' && <SettingsScreen />}
         {route.name === 'title' && (
           <DetailsScreen mediaType={route.mediaType} tmdbId={route.tmdbId} />

@@ -3,13 +3,27 @@ import type { MediaType } from '@movie-watchlist/core';
 
 export type Route =
   | { name: 'list' }
-  | { name: 'search' }
+  /** `query` prefills the search box (e.g. from Android Share); `notFound` means a share had no title. */
+  | { name: 'search'; query?: string; notFound?: boolean }
   | { name: 'title'; mediaType: MediaType; tmdbId: number }
   | { name: 'settings' };
 
+const MAX_ROUTE_QUERY_LENGTH = 200;
+
 export function parseRoute(hash: string): Route {
-  const [, first, second, third] = hash.replace(/^#/, '').split('/');
-  if (first === 'search') return { name: 'search' };
+  const body = hash.replace(/^#/, '');
+  const queryAt = body.indexOf('?');
+  const path = queryAt === -1 ? body : body.slice(0, queryAt);
+  const params = new URLSearchParams(queryAt === -1 ? '' : body.slice(queryAt + 1));
+  const [, first, second, third] = path.split('/');
+  if (first === 'search') {
+    const query = params.get('q')?.trim().slice(0, MAX_ROUTE_QUERY_LENGTH);
+    return {
+      name: 'search',
+      ...(query ? { query } : {}),
+      ...(!query && params.get('notFound') === '1' ? { notFound: true } : {}),
+    };
+  }
   if (first === 'settings') return { name: 'settings' };
   if (first === 'title' && (second === 'movie' || second === 'tv')) {
     const tmdbId = Number(third);
@@ -23,7 +37,8 @@ export function routeHref(route: Route): string {
     case 'list':
       return '#/';
     case 'search':
-      return '#/search';
+      if (route.query) return `#/search?q=${encodeURIComponent(route.query)}`;
+      return route.notFound ? '#/search?notFound=1' : '#/search';
     case 'settings':
       return '#/settings';
     case 'title':
