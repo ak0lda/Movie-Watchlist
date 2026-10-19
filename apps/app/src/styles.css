@@ -14,13 +14,25 @@ body {
   margin: 0;
 }
 
+/* Keep content clear of system bars: env() is the standard way, the --safe-area-inset-* variables
+   are set by Capacitor's SystemBars on Android WebViews that do not report env() insets. */
+:root {
+  --inset-top: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --inset-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+  --inset-left: max(env(safe-area-inset-left, 0px), var(--safe-area-inset-left, 0px));
+  --inset-right: max(env(safe-area-inset-right, 0px), var(--safe-area-inset-right, 0px));
+}
+
 .app {
+  padding-top: var(--inset-top);
+  padding-bottom: var(--inset-bottom);
+  padding-left: max(1rem, var(--inset-left));
+  padding-right: max(1rem, var(--inset-right));
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   max-width: 48rem;
   margin: 0 auto;
-  padding: 0 1rem;
 }
 
 header {

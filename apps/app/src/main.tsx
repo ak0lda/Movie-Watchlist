@@ -1,4 +1,6 @@
-import { SyncEngine } from '@movie-watchlist/core';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
@@ -8,12 +10,11 @@ import { MetaCache } from './data/metaCache';
 import { requestPersistence } from './data/persist';
 import { EntryRepository } from './data/repository';
 import './i18n';
+import { startPlatformSync } from './platform';
+import { WebDavHttp } from './platform/native/webDavHttp';
 import { ServicesProvider, type Services } from './services';
 import { SettingsStore, resolveTmdbConfig } from './settings/settings';
 import { getDesktopApi } from './sync/desktopApi';
-import { IpcSyncProvider } from './sync/IpcSyncProvider';
-import { SyncService } from './sync/SyncService';
-import { createSyncSettingsApi } from './sync/syncSettingsApi';
 import './styles.css';
 
 const container = document.getElementById('root');
@@ -33,16 +34,25 @@ const services: Services = {
   tmdbEnvKey,
 };
 
-const desktop = getDesktopApi();
-if (desktop) {
-  const engine = new SyncEngine({
-    provider: new IpcSyncProvider(desktop.sync),
-    store: services.repo,
-  });
-  const service = new SyncService(engine);
-  services.sync = { service, settings: createSyncSettingsApi(desktop.sync) };
-  service.start(document, desktop.onWindowHidden);
-}
+const sync = startPlatformSync(
+  {
+    desktop: getDesktopApi(),
+    // Only the real Android app gets the Keystore-backed secret storage; the plugin's web
+    // fallback keeps values unencrypted, so it must never be used for the password.
+    android:
+      Capacitor.getPlatform() === 'android'
+        ? {
+            webDavHttp: WebDavHttp,
+            secureStorage: SecureStorage,
+            app: CapacitorApp,
+            storage: localStorage,
+          }
+        : undefined,
+    document,
+  },
+  services.repo,
+);
+if (sync) services.sync = sync;
 
 void requestPersistence();
 

@@ -9,3 +9,5 @@ export * from './types';
 export * from './base64';
 export * from './desktopBridge';
 export * from './webdav';
+export * from './syncBackend';
+export * from './syncDefaults';

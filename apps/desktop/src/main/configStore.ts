@@ -1,17 +1,16 @@
 import { readFile } from 'node:fs/promises';
+import {
+  DEFAULT_FILE_PATH,
+  DEFAULT_SERVER_URL,
+  type StoredSyncConfig,
+  type SyncConfigPort,
+} from '@movie-watchlist/core';
 import { isNotFound, writeFileAtomic } from './fsUtil';
 
-export interface StoredSyncConfig {
-  serverUrl: string;
-  filePath: string;
-  login: string;
-}
-
-export const DEFAULT_SERVER_URL = 'https://webdav.yandex.ru';
-export const DEFAULT_FILE_PATH = '/Apps/MovieWatchlist/movies.json';
+export { DEFAULT_FILE_PATH, DEFAULT_SERVER_URL, type StoredSyncConfig };
 
 /** Non-secret sync settings in a JSON file. A missing or corrupt file means "not configured". */
-export class ConfigStore {
+export class ConfigStore implements SyncConfigPort {
   constructor(private readonly filePath: string) {}
 
   async load(): Promise<StoredSyncConfig | null> {

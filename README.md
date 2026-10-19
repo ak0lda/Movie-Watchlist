@@ -24,6 +24,23 @@ Sync settings (server URL, file path, login, app password) are in **Settings**. 
 `https://webdav.yandex.ru` and `/Apps/MovieWatchlist/movies.json`. The app creates missing folders itself.
 The password is encrypted with Electron `safeStorage` in the main process and is never sent back to the page.
 
+### Android (Capacitor)
+
+Needs a **full JDK 21** (with `jlink`; the JBR bundled with JetBrains IDEs is not enough) and the Android SDK.
+Debug APK:
+
+```sh
+export JAVA_HOME=/path/to/jdk-21 ANDROID_HOME=/path/to/Android/Sdk
+pnpm --filter @movie-watchlist/app android:sync     # build the web app and copy it into android/
+cd apps/app/android && ./gradlew testDebugUnitTest assembleDebug
+# -> apps/app/android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Network access on Android goes through the app's own `WebDavHttp` plugin (OkHttp), because `CapacitorHttp`
+(`HttpURLConnection`) cannot send WebDAV verbs such as `MKCOL`. The sync password is kept in the Android
+Keystore through `@aparajita/capacitor-secure-storage`; backups are disabled so it cannot be restored elsewhere.
+Unlike Electron, the Android WebView itself reads the password while syncing (there is no separate main process).
+
 Copy `.env.example` to `.env` and set your own keys; never commit `.env`.
 
 ## Known limitations
