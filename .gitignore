@@ -17,3 +17,10 @@ spike-report.md
 # Playwright output
 test-results/
 playwright-report/
+
+# Desktop packaging output (pnpm --filter @movie-watchlist/desktop dist)
+apps/desktop/renderer/
+apps/desktop/release/
+
+# Collected installers
+installers/

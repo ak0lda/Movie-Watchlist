@@ -7,7 +7,16 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-  globalIgnores(['**/dist/**', '**/node_modules/**', '**/android/**', 'spike/**', '.omc/**']),
+  globalIgnores([
+    '**/dist/**',
+    '**/node_modules/**',
+    '**/android/**',
+    'spike/**',
+    '.omc/**',
+    'apps/desktop/renderer/**',
+    'apps/desktop/release/**',
+    'installers/**',
+  ]),
   js.configs.recommended,
   tseslint.configs.recommended,
   {

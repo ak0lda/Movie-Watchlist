@@ -27,7 +27,7 @@
     "searchLabel": "Search the list",
     "searchPlaceholder": "Title, source or note",
     "filterLabel": "Filter by status",
-    "filterAll": "All statuses",
+    "filterAll": "All",
     "sortLabel": "Sort by",
     "sort": {
       "addedAt": "Date added",
@@ -36,7 +36,11 @@
     },
     "empty": "Your list is empty. Find something in Search.",
     "ratingBadge": "★ {{rating}}",
-    "emptyFiltered": "Nothing matches the current filters."
+    "emptyFiltered": "Nothing matches the current filters.",
+    "emptyAction": "Find a title",
+    "sourceBadge": "From {{source}}",
+    "count": "Total: {{count}}",
+    "resetFilters": "Reset filters"
   },
   "search": {
     "title": "Search",
@@ -46,10 +50,16 @@
     "noResults": "No results.",
     "inList": "In your list",
     "add": "Add to list",
-    "shareNotFound": "Could not find a title in the shared text. Type it below."
+    "shareNotFound": "Could not find a title in the shared text. Type it below.",
+    "shareReceived": "Received: {{text}}",
+    "shareNothing": "Nothing was received from the other app.",
+    "kinopoiskLooking": "Looking up the title on Kinopoisk…",
+    "kinopoiskNeedsKey": "This is a Kinopoisk link. To find the title automatically, add a Kinopoisk API key in",
+    "kinopoiskUnavailable": "Finding a title from a Kinopoisk link works only in the Android app. Type it below.",
+    "hint": "Find movies and series by title and add them to your list."
   },
   "details": {
-    "back": "← Back to list",
+    "back": "Back to list",
     "add": "Add to list",
     "tmdbRating": "TMDB",
     "savedCopy": "Showing the saved copy."
@@ -91,6 +101,12 @@
       "export": "Export JSON",
       "import": "Import JSON",
       "importDone": "Imported {{total}} entries, {{changed}} changed in your list."
+    },
+    "kinopoisk": {
+      "title": "Kinopoisk",
+      "key": "Kinopoisk API key (optional)",
+      "hint": "Only needed so that sharing a Kinopoisk link finds the title. Get a key on kinopoiskapiunofficial.tech. It is stored only on this device.",
+      "save": "Save Kinopoisk key"
     }
   },
   "errors": {
@@ -111,6 +127,13 @@
       "conflict": "The remote file keeps changing. Try again.",
       "storage": "Could not update local storage.",
       "config": "Sync is not set up correctly. Check that the server URL starts with https://, the path is absolute, and the login and password are saved."
+    },
+    "kinopoisk": {
+      "noKey": "Add a Kinopoisk API key in Settings to look titles up from links.",
+      "auth": "Kinopoisk rejected the API key. Check it in Settings.",
+      "notFound": "Kinopoisk has no title for this link. Type it below.",
+      "rateLimited": "The Kinopoisk request limit is used up. Try again later.",
+      "network": "Could not reach Kinopoisk. Check your connection or type the title below."
     }
   },
   "sync": {

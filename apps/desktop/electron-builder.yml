@@ -1,0 +1,24 @@
+appId: app.moviewatchlist.desktop
+productName: Movie Watchlist
+copyright: Copyright © 2026 ak0lda
+directories:
+  output: release
+  buildResources: build
+# Everything the app needs is bundled: main/preload (esbuild) and the renderer (Vite).
+files:
+  - package.json
+  - dist/*.cjs
+  - renderer/**
+npmRebuild: false
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.png
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  artifactName: Movie-Watchlist-Setup-${version}.${ext}

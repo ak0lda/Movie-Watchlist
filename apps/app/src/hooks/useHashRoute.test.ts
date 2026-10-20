@@ -79,6 +79,60 @@ describe('search route with a query', () => {
     expect(parseRoute('#/search?q=Dune&notFound=1')).toEqual({ name: 'search', query: 'Dune' });
   });
 
+  it('carries what a share contained when no title was found', () => {
+    const href = routeHref({
+      name: 'search',
+      notFound: true,
+      received: 'https://x.example/?a=1&b=2',
+    });
+    expect(parseRoute(href)).toEqual({
+      name: 'search',
+      notFound: true,
+      received: 'https://x.example/?a=1&b=2',
+    });
+    expect(parseRoute('#/search?notFound=1&got=')).toEqual({ name: 'search', notFound: true });
+    // Ignored without the marker, and capped in length.
+    expect(parseRoute('#/search?got=abc')).toEqual({ name: 'search' });
+    const long = parseRoute(`#/search?notFound=1&got=${'a'.repeat(5000)}`) as { received: string };
+    expect(long.received.length).toBeLessThanOrEqual(400);
+  });
+
+  it('carries a Kinopoisk number to look up', () => {
+    expect(parseRoute('#/search?kp=535341')).toEqual({ name: 'search', kinopoiskId: 535341 });
+    expect(parseRoute('#/search?kp=535341&got=abc')).toEqual({
+      name: 'search',
+      kinopoiskId: 535341,
+      received: 'abc',
+    });
+    const href = routeHref({
+      name: 'search',
+      kinopoiskId: 7,
+      received: 'https://x.example/?a=1&b=2',
+    });
+    expect(parseRoute(href)).toEqual({
+      name: 'search',
+      kinopoiskId: 7,
+      received: 'https://x.example/?a=1&b=2',
+    });
+    expect(routeHref({ name: 'search', kinopoiskId: 7 })).toBe('#/search?kp=7');
+  });
+
+  it.each([
+    '#/search?kp=0',
+    '#/search?kp=-5',
+    '#/search?kp=abc',
+    '#/search?kp=1.5',
+    '#/search?kp=1000000000',
+    '#/search?kp=',
+  ])('ignores the invalid kp value in %j', (hash) => {
+    expect(parseRoute(hash)).toEqual({ name: 'search' });
+  });
+
+  it('a text query wins over a Kinopoisk lookup, which wins over the not-found marker', () => {
+    expect(parseRoute('#/search?q=Dune&kp=5')).toEqual({ name: 'search', query: 'Dune' });
+    expect(parseRoute('#/search?kp=5&notFound=1')).toEqual({ name: 'search', kinopoiskId: 5 });
+  });
+
   it('builds hrefs', () => {
     expect(routeHref({ name: 'search' })).toBe('#/search');
     expect(routeHref({ name: 'search', query: 'Дюна' })).toBe(

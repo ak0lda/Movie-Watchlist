@@ -105,6 +105,39 @@ describe('parseSharedText: quoting and structure', () => {
   });
 });
 
+describe('parseSharedText: page titles (subject of a browser share)', () => {
+  it.each([
+    ['Дюна (2021) — смотреть онлайн — Кинопоиск', 'Дюна'],
+    ['Дюна (фильм, 2021) — Кинопоиск', 'Дюна'],
+    ['Дюна — смотреть онлайн — Кинопоиск', 'Дюна'],
+    ['Дюна смотреть онлайн бесплатно в хорошем качестве', 'Дюна'],
+    ['Dune: Part Two (2024) - IMDb', 'Dune: Part Two'],
+    ['Dune (2021) | Watch online | Netflix', 'Dune'],
+    ['Игра престолов (сериал, 2011 – 2019) — Кинопоиск', 'Игра престолов'],
+    ['Watch Dogs', 'Watch Dogs'],
+    ['Watch Dogs (2014) - IMDb', 'Watch Dogs'],
+  ])('%j -> %j', (input, expected) => {
+    expect(parseSharedText(input)).toBe(expected);
+  });
+});
+
+describe('parseSharedText: words that only describe the share', () => {
+  it.each([
+    ['Посмотри фильм'],
+    ['Смотри сериал https://x.example'],
+    ['Рекомендую кино'],
+    ['Check out this movie'],
+    ['Ссылка'],
+  ])('%j -> empty', (input) => {
+    expect(parseSharedText(input)).toBe('');
+  });
+
+  it('still keeps titles that merely contain such a word', () => {
+    expect(parseSharedText('Смотри Фильм ужасов')).toBe('Фильм ужасов');
+    expect(parseSharedText('Check out Movie 43')).toBe('Movie 43');
+  });
+});
+
 describe('parseSharedText: nothing to search for', () => {
   it.each([
     [''],

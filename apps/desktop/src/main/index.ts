@@ -32,7 +32,10 @@ const userDataOverride = devMode ? process.env['MW_USER_DATA_DIR'] : undefined;
 if (userDataOverride) app.setPath('userData', userDataOverride);
 
 const trustedOrigin = rendererDevUrl ? (originKey(rendererDevUrl) ?? APP_ORIGIN) : APP_ORIGIN;
-const rendererDir = path.resolve(__dirname, '../../app/dist');
+// Packaged: scripts/dist.mjs copies the renderer into the app archive. Unpackaged: the app workspace's build.
+const rendererDir = app.isPackaged
+  ? path.join(app.getAppPath(), 'renderer')
+  : path.resolve(__dirname, '../../app/dist');
 
 protocol.registerSchemesAsPrivileged([
   { scheme: APP_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true } },

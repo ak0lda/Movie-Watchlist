@@ -5,3 +5,6 @@ android
 spike
 spike-report.md
 .omc
+apps/desktop/renderer
+apps/desktop/release
+installers

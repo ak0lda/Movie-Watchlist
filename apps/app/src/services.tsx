@@ -8,6 +8,7 @@ import {
   type SettingsStore,
   type TmdbConfig,
 } from './settings/settings';
+import type { KinopoiskResolver } from './share/kinopoisk';
 import type { SyncService } from './sync/SyncService';
 import type { SyncSettingsApi } from './sync/syncSettingsApi';
 
@@ -20,6 +21,8 @@ export interface Services {
   tmdbEnvKey: string;
   /** Present only on platforms with a sync backend (the Electron shell, later Android). */
   sync?: { service: SyncService; settings: SyncSettingsApi };
+  /** Present only in the Android app: turns a shared Kinopoisk link into a title. */
+  kinopoisk?: KinopoiskResolver;
 }
 
 const ServicesContext = createContext<Services | null>(null);

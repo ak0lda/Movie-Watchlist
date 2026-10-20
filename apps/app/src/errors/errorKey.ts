@@ -1,4 +1,5 @@
 import { CatalogError, SchemaError, SyncError } from '@movie-watchlist/core';
+import { KinopoiskError } from '../share/kinopoisk';
 
 /** Maps typed errors to translation keys; the UI never shows raw error messages. */
 export function errorKey(error: unknown): string {
@@ -12,6 +13,20 @@ export function errorKey(error: unknown): string {
         return 'errors.catalog.rateLimited';
       case 'network':
         return 'errors.catalog.network';
+    }
+  }
+  if (error instanceof KinopoiskError) {
+    switch (error.code) {
+      case 'no-key':
+        return 'errors.kinopoisk.noKey';
+      case 'auth':
+        return 'errors.kinopoisk.auth';
+      case 'not-found':
+        return 'errors.kinopoisk.notFound';
+      case 'rate-limited':
+        return 'errors.kinopoisk.rateLimited';
+      case 'network':
+        return 'errors.kinopoisk.network';
     }
   }
   if (error instanceof SchemaError) {

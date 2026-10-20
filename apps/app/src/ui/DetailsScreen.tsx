@@ -10,9 +10,11 @@ import { useTranslation } from 'react-i18next';
 import { addTitle } from '../data/addEntry';
 import type { EntryPatch } from '../data/repository';
 import { errorKey } from '../errors/errorKey';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { routeHref } from '../hooks/useHashRoute';
 import { useServices, useTmdbConfig } from '../services';
 import { EntryEditor } from './EntryEditor';
+import { Icons } from './icons';
 import { PosterImage } from './PosterImage';
 
 /** The offline backup copy stored with the entry, shaped like fresh catalog details. */
@@ -90,6 +92,7 @@ export function DetailsScreen({ mediaType, tmdbId }: DetailsScreenProps) {
 
   const live = entry && !entry.deleted ? entry : null;
   const view = fresh ?? (entry ? detailsFromEntry(entry) : null);
+  useDocumentTitle(view?.title);
 
   async function handleAdd() {
     if (!view) return;
@@ -101,14 +104,22 @@ export function DetailsScreen({ mediaType, tmdbId }: DetailsScreenProps) {
     }
   }
 
-  const backLink = <a href={routeHref({ name: 'list' })}>{t('details.back')}</a>;
+  const backLink = (
+    <a className="btn btn-sm back" href={routeHref({ name: 'list' })}>
+      <Icons.back />
+      {t('details.back')}
+    </a>
+  );
 
-  if (entry === undefined) return <p>{t('common.loading')}</p>;
+  if (entry === undefined) return <p className="loading">{t('common.loading')}</p>;
   if (!view) {
     return (
       <section>
         {backLink}
-        <p role={loadErrorKey ? 'alert' : undefined}>
+        <p
+          role={loadErrorKey ? 'alert' : undefined}
+          className={loadErrorKey ? 'callout callout-error' : 'loading'}
+        >
           {loadErrorKey ? t(loadErrorKey) : t('common.loading')}
         </p>
       </section>
@@ -117,44 +128,60 @@ export function DetailsScreen({ mediaType, tmdbId }: DetailsScreenProps) {
 
   return (
     <section>
-      {backLink}
-      <div className="details">
-        <PosterImage posterPath={view.posterPath} title={view.title} />
-        <div>
-          <h1>{view.title}</h1>
-          {view.originalTitle !== view.title && <p className="muted">{view.originalTitle}</p>}
-          <p className="muted">
-            {t(`mediaType.${view.mediaType}`)}
-            {view.year !== undefined && <> · {view.year}</>}
-            {view.tmdbRating !== undefined && (
-              <>
-                {' '}
-                · {t('details.tmdbRating')} {view.tmdbRating.toFixed(1)}
-              </>
+      <div className="hero">
+        {backLink}
+        <div className="details">
+          <PosterImage posterPath={view.posterPath} title={view.title} />
+          <div className="details-info">
+            <h1>{view.title}</h1>
+            {view.originalTitle !== view.title && <p className="muted">{view.originalTitle}</p>}
+            <div className="meta">
+              <span className="tag">{t(`mediaType.${view.mediaType}`)}</span>
+              {view.year !== undefined && <span className="tag">{view.year}</span>}
+              {view.tmdbRating !== undefined && (
+                <span className="tag tag-accent">
+                  {t('details.tmdbRating')} {view.tmdbRating.toFixed(1)}
+                </span>
+              )}
+            </div>
+            {view.genres.length > 0 && <p className="muted">{view.genres.join(', ')}</p>}
+            {!live && (
+              <div className="details-actions">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  disabled={busy}
+                  onClick={() => void handleAdd()}
+                >
+                  <Icons.plus />
+                  {t('details.add')}
+                </button>
+              </div>
             )}
-          </p>
-          {view.genres.length > 0 && <p>{view.genres.join(', ')}</p>}
+          </div>
         </div>
       </div>
-      {view.overview && <p>{view.overview}</p>}
-      {loadErrorKey && (
-        <p role="alert" className="muted">
-          {t(loadErrorKey)} {t('details.savedCopy')}
-        </p>
-      )}
 
-      {live ? (
-        <EntryEditor
-          key={live.id}
-          entry={live}
-          onSave={(patch: EntryPatch) => repo.update(live.id, patch)}
-          onRemove={() => repo.remove(live.id)}
-        />
-      ) : (
-        <button type="button" disabled={busy} onClick={() => void handleAdd()}>
-          {t('details.add')}
-        </button>
-      )}
+      <div className="details-body">
+        <div className="details-text">
+          {view.overview && <p className="overview">{view.overview}</p>}
+          {loadErrorKey && (
+            <p role="alert" className="muted">
+              {t(loadErrorKey)} {t('details.savedCopy')}
+            </p>
+          )}
+        </div>
+        {live && (
+          <div className="panel">
+            <EntryEditor
+              key={live.id}
+              entry={live}
+              onSave={(patch: EntryPatch) => repo.update(live.id, patch)}
+              onRemove={() => repo.remove(live.id)}
+            />
+          </div>
+        )}
+      </div>
     </section>
   );
 }

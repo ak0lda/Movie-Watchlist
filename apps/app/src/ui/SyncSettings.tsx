@@ -48,7 +48,7 @@ export function SyncSettings() {
   }, [settingsApi]);
 
   if (!settingsApi) return null;
-  if (!loaded) return <p>{notice ? t(notice.key) : t('common.loading')}</p>;
+  if (!loaded) return <p className="panel muted">{notice ? t(notice.key) : t('common.loading')}</p>;
 
   /** Cheap checks that need no round trip; the main process validates everything again. */
   function problemWith(config: SyncConfigView): string | null {
@@ -97,7 +97,7 @@ export function SyncSettings() {
   }
 
   return (
-    <>
+    <div className="panel">
       <h2>{t('sync.settings.title')}</h2>
       <form className="editor" onSubmit={(event) => void handleSave(event)}>
         <label>
@@ -137,9 +137,11 @@ export function SyncSettings() {
         </label>
         <p className="muted">{t('sync.settings.passwordHint')}</p>
         <div className="row">
-          <button type="submit">{t('sync.settings.save')}</button>
+          <button type="submit" className="btn-primary">
+            {t('sync.settings.save')}
+          </button>
           {loaded.hasPassword && (
-            <button type="button" className="danger" onClick={() => void handleForget()}>
+            <button type="button" className="btn-ghost danger" onClick={() => void handleForget()}>
               {t('sync.settings.forgetPassword')}
             </button>
           )}
@@ -148,6 +150,6 @@ export function SyncSettings() {
           )}
         </div>
       </form>
-    </>
+    </div>
   );
 }

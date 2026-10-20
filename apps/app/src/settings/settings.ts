@@ -9,9 +9,16 @@ export interface Settings {
   /** Empty means the default. */
   apiBaseUrl: string;
   imageBaseUrl: string;
+  /** Optional key of the unofficial Kinopoisk API (turns a shared Kinopoisk link into a title). */
+  kinopoiskKey: string;
 }
 
-export const EMPTY_SETTINGS: Settings = { tmdbKey: '', apiBaseUrl: '', imageBaseUrl: '' };
+export const EMPTY_SETTINGS: Settings = {
+  tmdbKey: '',
+  apiBaseUrl: '',
+  imageBaseUrl: '',
+  kinopoiskKey: '',
+};
 
 export interface TmdbConfig {
   apiKey: string;
@@ -51,6 +58,7 @@ export function loadSettings(storage: Pick<Storage, 'getItem'>): Settings {
       tmdbKey: text('tmdbKey'),
       apiBaseUrl: text('apiBaseUrl'),
       imageBaseUrl: text('imageBaseUrl'),
+      kinopoiskKey: text('kinopoiskKey'),
     };
   } catch {
     return EMPTY_SETTINGS;

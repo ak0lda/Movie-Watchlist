@@ -13,6 +13,7 @@ import { MetaCache } from '../data/metaCache';
 import { EntryRepository } from '../data/repository';
 import type { Services } from '../services';
 import { SettingsStore } from '../settings/settings';
+import type { KinopoiskResolver } from '../share/kinopoisk';
 import { SyncService, type SyncRunner } from '../sync/SyncService';
 import type { SyncSettingsApi } from '../sync/syncSettingsApi';
 
@@ -118,14 +119,27 @@ let dbCounter = 0;
 
 /** Fresh isolated Dexie database (fake-indexeddb) plus every service the UI needs. */
 export function createTestServices(
-  options: { now?: () => Date; tmdbKey?: string; sync?: boolean } = {},
+  options: {
+    now?: () => Date;
+    tmdbKey?: string;
+    sync?: boolean;
+    kinopoisk?: KinopoiskResolver;
+    kinopoiskKey?: string;
+  } = {},
 ) {
   dbCounter += 1;
   const db = new WatchlistDb(`test-db-${dbCounter}`);
   const now = options.now ?? (() => T0);
   const catalog = new FakeCatalog();
   const settings = new SettingsStore();
-  if (options.tmdbKey) settings.set({ tmdbKey: options.tmdbKey, apiBaseUrl: '', imageBaseUrl: '' });
+  if (options.tmdbKey || options.kinopoiskKey) {
+    settings.set({
+      tmdbKey: options.tmdbKey ?? '',
+      apiBaseUrl: '',
+      imageBaseUrl: '',
+      kinopoiskKey: options.kinopoiskKey ?? '',
+    });
+  }
   const services: Services = {
     repo: new EntryRepository(db, now),
     metaCache: new MetaCache(db, () => now().getTime()),
@@ -137,5 +151,6 @@ export function createTestServices(
   const syncSettings = new FakeSyncSettings();
   const syncService = new SyncService(runner, () => now().getTime());
   if (options.sync) services.sync = { service: syncService, settings: syncSettings };
+  if (options.kinopoisk) services.kinopoisk = options.kinopoisk;
   return { db, catalog, settings, services, runner, syncSettings, syncService };
 }

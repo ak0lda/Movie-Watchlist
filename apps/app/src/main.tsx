@@ -11,8 +11,10 @@ import { requestPersistence } from './data/persist';
 import { EntryRepository } from './data/repository';
 import './i18n';
 import { startPlatformSync } from './platform';
+import { createCapacitorTransport } from './platform/native/CapacitorTransport';
 import { WebDavHttp } from './platform/native/webDavHttp';
 import { ServicesProvider, type Services } from './services';
+import { createKinopoiskResolver } from './share/kinopoisk';
 import { startShareHandling } from './share/shareService';
 import { ShareTarget } from './share/shareTarget';
 import { SettingsStore, resolveTmdbConfig } from './settings/settings';
@@ -58,6 +60,11 @@ if (sync) services.sync = sync;
 
 // "Share" from other Android apps opens the search screen with the shared title.
 if (Capacitor.getPlatform() === 'android') {
+  // The native HTTP plugin sends the request, so the page's CORS rules do not apply to it.
+  services.kinopoisk = createKinopoiskResolver({
+    transport: createCapacitorTransport(WebDavHttp),
+    getKey: () => settings.get().kinopoiskKey,
+  });
   startShareHandling(ShareTarget, (href) => {
     window.location.hash = href;
   });

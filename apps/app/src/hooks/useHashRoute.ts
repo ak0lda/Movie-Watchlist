@@ -4,7 +4,7 @@ import type { MediaType } from '@movie-watchlist/core';
 export type Route =
   | { name: 'list' }
   /** `query` prefills the search box (e.g. from Android Share); `notFound` means a share had no title. */
-  | { name: 'search'; query?: string; notFound?: boolean }
+  | { name: 'search'; query?: string; notFound?: boolean; received?: string; kinopoiskId?: number }
   | { name: 'title'; mediaType: MediaType; tmdbId: number }
   | { name: 'settings' };
 
@@ -18,10 +18,27 @@ export function parseRoute(hash: string): Route {
   const [, first, second, third] = path.split('/');
   if (first === 'search') {
     const query = params.get('q')?.trim().slice(0, MAX_ROUTE_QUERY_LENGTH);
+    const kp = Number(params.get('kp'));
+    const kinopoiskId = Number.isInteger(kp) && kp > 0 && kp <= 999_999_999 ? kp : undefined;
     return {
       name: 'search',
       ...(query ? { query } : {}),
-      ...(!query && params.get('notFound') === '1' ? { notFound: true } : {}),
+      ...(!query && kinopoiskId !== undefined
+        ? {
+            kinopoiskId,
+            ...(params.get('got')
+              ? { received: params.get('got')!.slice(0, MAX_ROUTE_QUERY_LENGTH * 2) }
+              : {}),
+          }
+        : {}),
+      ...(!query && kinopoiskId === undefined && params.get('notFound') === '1'
+        ? {
+            notFound: true,
+            ...(params.get('got')
+              ? { received: params.get('got')!.slice(0, MAX_ROUTE_QUERY_LENGTH * 2) }
+              : {}),
+          }
+        : {}),
     };
   }
   if (first === 'settings') return { name: 'settings' };
@@ -38,7 +55,14 @@ export function routeHref(route: Route): string {
       return '#/';
     case 'search':
       if (route.query) return `#/search?q=${encodeURIComponent(route.query)}`;
-      return route.notFound ? '#/search?notFound=1' : '#/search';
+      if (route.kinopoiskId !== undefined) {
+        const base = `#/search?kp=${route.kinopoiskId}`;
+        return route.received ? `${base}&got=${encodeURIComponent(route.received)}` : base;
+      }
+      if (!route.notFound) return '#/search';
+      return route.received
+        ? `#/search?notFound=1&got=${encodeURIComponent(route.received)}`
+        : '#/search?notFound=1';
     case 'settings':
       return '#/settings';
     case 'title':

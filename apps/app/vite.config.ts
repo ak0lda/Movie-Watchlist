@@ -7,6 +7,6 @@ export default defineConfig({
     name: 'app',
     environment: 'node',
     // Must run before Dexie is imported: it captures the IndexedDB global at load time.
-    setupFiles: ['fake-indexeddb/auto'],
+    setupFiles: ['fake-indexeddb/auto', './src/testing/setup.ts'],
   },
 });

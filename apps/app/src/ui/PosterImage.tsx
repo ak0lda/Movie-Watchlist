@@ -1,5 +1,11 @@
 import { posterUrl } from '../catalog/tmdbMapping';
 import { useTmdbConfig } from '../services';
+import { Icons } from './icons';
+
+export function usePosterUrl(posterPath: string | undefined): string | undefined {
+  const { imageBaseUrl } = useTmdbConfig();
+  return posterUrl(imageBaseUrl, posterPath);
+}
 
 export function PosterImage({
   posterPath,
@@ -8,8 +14,13 @@ export function PosterImage({
   posterPath?: string | undefined;
   title: string;
 }) {
-  const { imageBaseUrl } = useTmdbConfig();
-  const src = posterUrl(imageBaseUrl, posterPath);
-  if (!src) return <div className="poster poster-empty" aria-hidden />;
-  return <img className="poster" src={src} alt={title} loading="lazy" />;
+  const src = usePosterUrl(posterPath);
+  if (!src) {
+    return (
+      <div className="poster poster-empty" aria-hidden>
+        <Icons.film />
+      </div>
+    );
+  }
+  return <img className="poster" src={src} alt={title} loading="lazy" decoding="async" />;
 }

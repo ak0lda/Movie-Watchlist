@@ -2,6 +2,7 @@ import type { MovieEntry, WatchStatus } from '@movie-watchlist/core';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { EntryPatch } from '../data/repository';
+import { Icons } from './icons';
 
 const STATUSES: readonly WatchStatus[] = ['want', 'watching', 'watched'];
 const RATINGS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -30,39 +31,41 @@ export function EntryEditor({ entry, onSave, onRemove }: EntryEditorProps) {
 
   return (
     <form className="editor" onSubmit={(event) => void handleSubmit(event)}>
-      <label>
-        {t('editor.status')}
-        <select
-          value={status}
-          onChange={(event) => {
-            setStatus(event.target.value as WatchStatus);
-            setSaved(false);
-          }}
-        >
-          {STATUSES.map((value) => (
-            <option key={value} value={value}>
-              {t(`status.${value}`)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        {t('editor.rating')}
-        <select
-          value={rating}
-          onChange={(event) => {
-            setRating(event.target.value);
-            setSaved(false);
-          }}
-        >
-          <option value="">{t('editor.ratingNone')}</option>
-          {RATINGS.map((value) => (
-            <option key={value} value={String(value)}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="editor-grid">
+        <label>
+          {t('editor.status')}
+          <select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value as WatchStatus);
+              setSaved(false);
+            }}
+          >
+            {STATUSES.map((value) => (
+              <option key={value} value={value}>
+                {t(`status.${value}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          {t('editor.rating')}
+          <select
+            value={rating}
+            onChange={(event) => {
+              setRating(event.target.value);
+              setSaved(false);
+            }}
+          >
+            <option value="">{t('editor.ratingNone')}</option>
+            {RATINGS.map((value) => (
+              <option key={value} value={String(value)}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <label>
         {t('editor.source')}
         <input
@@ -85,26 +88,43 @@ export function EntryEditor({ entry, onSave, onRemove }: EntryEditorProps) {
         />
       </label>
       <div className="row">
-        <button type="submit">{t('editor.save')}</button>
-        {saved && <span role="status">{t('editor.saved')}</span>}
-      </div>
-      <div className="row">
-        {confirmingRemove ? (
-          <>
-            <span>{t('editor.removeConfirm')}</span>
-            <button type="button" className="danger" onClick={() => void onRemove()}>
-              {t('editor.removeYes')}
-            </button>
-            <button type="button" onClick={() => setConfirmingRemove(false)}>
-              {t('editor.cancel')}
-            </button>
-          </>
-        ) : (
-          <button type="button" className="danger" onClick={() => setConfirmingRemove(true)}>
-            {t('editor.remove')}
-          </button>
+        <button type="submit" className="btn-primary">
+          {t('editor.save')}
+        </button>
+        {saved && (
+          <span role="status" className="in-list">
+            <Icons.check />
+            {t('editor.saved')}
+          </span>
         )}
       </div>
+      <div className="divider" />
+      {confirmingRemove ? (
+        <div className="confirm">
+          <span>{t('editor.removeConfirm')}</span>
+          <button
+            type="button"
+            className="btn-primary danger btn-sm"
+            onClick={() => void onRemove()}
+          >
+            {t('editor.removeYes')}
+          </button>
+          <button type="button" className="btn-sm" onClick={() => setConfirmingRemove(false)}>
+            {t('editor.cancel')}
+          </button>
+        </div>
+      ) : (
+        <div className="row">
+          <button
+            type="button"
+            className="btn-ghost danger btn-sm"
+            onClick={() => setConfirmingRemove(true)}
+          >
+            <Icons.trash />
+            {t('editor.remove')}
+          </button>
+        </div>
+      )}
     </form>
   );
 }

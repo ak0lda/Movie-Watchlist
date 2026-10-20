@@ -6,3 +6,5 @@ packages:
 allowBuilds:
   esbuild: true
   electron: true
+  # Pulled in by electron-builder for Squirrel installers; the NSIS target does not use it.
+  electron-winstaller: false

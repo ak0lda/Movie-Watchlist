@@ -6,6 +6,8 @@ const config: CapacitorConfig = {
   appId: 'app.moviewatchlist',
   appName: 'Movie Watchlist',
   webDir: 'dist',
+  // Never log plugin call data: it contains the sync password and API keys.
+  loggingBehavior: 'none',
   server: { androidScheme: 'https' },
   android: { allowMixedContent: false },
 };

@@ -44,8 +44,12 @@ describe('resolveTmdbConfig', () => {
       imageBaseUrl: DEFAULT_IMAGE_BASE_URL,
     });
     expect(
-      resolveTmdbConfig({ tmdbKey: 'k', apiBaseUrl: 'http://insecure', imageBaseUrl: 'junk' })
-        .apiBaseUrl,
+      resolveTmdbConfig({
+        ...EMPTY_SETTINGS,
+        tmdbKey: 'k',
+        apiBaseUrl: 'http://insecure',
+        imageBaseUrl: 'junk',
+      }).apiBaseUrl,
     ).toBe(DEFAULT_API_BASE_URL);
   });
 
@@ -72,13 +76,39 @@ describe('loadSettings', () => {
   });
 });
 
+describe('kinopoiskKey', () => {
+  it('is empty by default and survives a reload', () => {
+    expect(EMPTY_SETTINGS.kinopoiskKey).toBe('');
+    const storage = memoryStorage();
+    new SettingsStore(storage).set({ ...EMPTY_SETTINGS, kinopoiskKey: 'kp-key' });
+    expect(new SettingsStore(storage).get().kinopoiskKey).toBe('kp-key');
+  });
+
+  it('is empty for settings saved by an older version and for a wrongly typed value', () => {
+    expect(
+      loadSettings(memoryStorage({ [SETTINGS_STORAGE_KEY]: JSON.stringify({ tmdbKey: 'a' }) }))
+        .kinopoiskKey,
+    ).toBe('');
+    expect(
+      loadSettings(memoryStorage({ [SETTINGS_STORAGE_KEY]: JSON.stringify({ kinopoiskKey: 5 }) }))
+        .kinopoiskKey,
+    ).toBe('');
+  });
+
+  it('does not leak into the TMDB configuration', () => {
+    expect(
+      JSON.stringify(resolveTmdbConfig({ ...EMPTY_SETTINGS, kinopoiskKey: 'kp-secret' })),
+    ).not.toContain('kp-secret');
+  });
+});
+
 describe('SettingsStore', () => {
   it('persists, reloads and notifies subscribers', () => {
     const storage = memoryStorage();
     const store = new SettingsStore(storage);
     const listener = vi.fn();
     const unsubscribe = store.subscribe(listener);
-    store.set({ tmdbKey: 'abc', apiBaseUrl: '', imageBaseUrl: '' });
+    store.set({ ...EMPTY_SETTINGS, tmdbKey: 'abc' });
     expect(listener).toHaveBeenCalledTimes(1);
     expect(new SettingsStore(storage).get().tmdbKey).toBe('abc');
     unsubscribe();
@@ -93,7 +123,7 @@ describe('SettingsStore', () => {
         throw new Error('quota');
       },
     });
-    expect(() => store.set({ tmdbKey: 'k', apiBaseUrl: '', imageBaseUrl: '' })).not.toThrow();
+    expect(() => store.set({ ...EMPTY_SETTINGS, tmdbKey: 'k' })).not.toThrow();
     expect(store.get().tmdbKey).toBe('k');
   });
 });

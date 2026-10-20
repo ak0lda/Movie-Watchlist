@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from '../App';
 import i18n from '../i18n';
 import { ServicesProvider } from '../services';
-import { startShareHandling, type ShareTargetPlugin } from '../share/shareService';
+import { startShareHandling, type ShareEvent, type ShareTargetPlugin } from '../share/shareService';
 import { createTestServices, makeItem } from '../testing/helpers';
 
 type TestServices = ReturnType<typeof createTestServices>;
@@ -87,6 +87,41 @@ describe('search opened from a share', () => {
     expect(screen.queryByText(/Could not find a title/)).toBeNull();
   });
 
+  it('shows what the other app sent, so the user can see why no title was found', () => {
+    renderApp(
+      createTestServices({ tmdbKey: 'k' }),
+      `#/search?notFound=1&got=${encodeURIComponent('https://www.kinopoisk.ru/film/409424/')}`,
+    );
+    expect(screen.getByRole('status').textContent).toContain(
+      'Received: https://www.kinopoisk.ru/film/409424/',
+    );
+  });
+
+  it('says so when the other app sent nothing at all', () => {
+    renderApp(createTestServices({ tmdbKey: 'k' }), '#/search?notFound=1');
+    expect(screen.getByRole('status').textContent).toContain(
+      'Nothing was received from the other app.',
+    );
+  });
+
+  it('shows the received text in Russian too', async () => {
+    await i18n.changeLanguage('ru');
+    renderApp(
+      createTestServices({ tmdbKey: 'k' }),
+      `#/search?notFound=1&got=${encodeURIComponent('https://x.example')}`,
+    );
+    expect(screen.getByRole('status').textContent).toContain('Получено: https://x.example');
+  });
+
+  it('does not render the received text as markup', () => {
+    renderApp(
+      createTestServices({ tmdbKey: 'k' }),
+      `#/search?notFound=1&got=${encodeURIComponent('<img src=x onerror=alert(1)>')}`,
+    );
+    expect(screen.getByRole('status').textContent).toContain('<img src=x onerror=alert(1)>');
+    expect(document.querySelector('img[src="x"]')).toBeNull();
+  });
+
   it('shows the hint in Russian', async () => {
     await i18n.changeLanguage('ru');
     renderApp(createTestServices({ tmdbKey: 'k' }), '#/search?notFound=1');
@@ -111,13 +146,13 @@ describe('search opened from a share', () => {
 
 describe('share -> route -> UI, end to end', () => {
   class FakePlugin implements ShareTargetPlugin {
-    private listener: ((event: { text?: unknown }) => void) | undefined;
-    addListener(_event: 'shareReceived', listener: (event: { text?: unknown }) => void) {
+    private listener: ((event: ShareEvent) => void) | undefined;
+    addListener(_event: 'shareReceived', listener: (event: ShareEvent) => void) {
       this.listener = listener;
       return Promise.resolve({ remove: () => Promise.resolve() });
     }
-    share(text: string) {
-      this.listener?.({ text });
+    share(event: ShareEvent) {
+      this.listener?.(event);
     }
   }
 
@@ -130,7 +165,7 @@ describe('share -> route -> UI, end to end', () => {
       window.location.hash = href;
     });
     await act(async () => {
-      plugin.share('Смотри Дюна https://www.kinopoisk.ru/film/409424/');
+      plugin.share({ text: 'Смотри Дюна https://www.kinopoisk.ru/film/409424/' });
       await new Promise((resolve) => setTimeout(resolve, 10));
     });
     await waitFor(() => expect(searchBox().value).toBe('Дюна'));
@@ -147,7 +182,7 @@ describe('share -> route -> UI, end to end', () => {
       window.location.hash = href;
     });
     await act(async () => {
-      plugin.share('https://www.kinopoisk.ru/film/409424/');
+      plugin.share({ text: 'https://www.imdb.com/title/tt15239678/' });
       await new Promise((resolve) => setTimeout(resolve, 10));
     });
     await waitFor(() =>

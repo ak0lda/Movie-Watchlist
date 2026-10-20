@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../App';
 import i18n from '../i18n';
 import { LANGUAGE_STORAGE_KEY } from '../i18n/resolveLanguage';
@@ -133,11 +133,15 @@ describe('list', () => {
     renderApp(await seeded());
     await screen.findByText('Alpha');
 
-    await user.selectOptions(screen.getByLabelText('Filter by status'), 'watched');
+    const filters = within(screen.getByRole('group', { name: 'Filter by status' }));
+    await user.click(filters.getByRole('button', { name: 'Watched' }));
+    expect(filters.getByRole('button', { name: 'Watched' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
     expect(screen.queryByText('Alpha')).toBeNull();
     expect(screen.getByText('Beta')).toBeTruthy();
 
-    await user.selectOptions(screen.getByLabelText('Filter by status'), 'all');
+    await user.click(filters.getByRole('button', { name: 'All' }));
     await user.type(screen.getByLabelText('Search the list'), 'vasya');
     expect(screen.queryByText('Alpha')).toBeNull();
     expect(screen.getByText('Beta')).toBeTruthy();
@@ -156,6 +160,33 @@ describe('list', () => {
       .getAllByRole('listitem')
       .map((item) => item.querySelector('strong')?.textContent);
     expect(titles).toEqual(['Beta', 'Alpha']);
+  });
+
+  it('resets the filters from the empty result', async () => {
+    const user = userEvent.setup();
+    renderApp(await seeded());
+    await screen.findByText('Alpha');
+    await user.type(screen.getByLabelText('Search the list'), 'zzz');
+    await user.click(screen.getByRole('button', { name: 'Reset filters' }));
+    expect((screen.getByLabelText('Search the list') as HTMLInputElement).value).toBe('');
+    expect(screen.getByText('Alpha')).toBeTruthy();
+    expect(screen.getByText('Beta')).toBeTruthy();
+  });
+
+  it('names the window after the screen', async () => {
+    renderApp(await seeded());
+    await screen.findByText('Alpha');
+    expect(document.title).toBe('My list · Movie Watchlist');
+  });
+
+  it('opens a title at the top of the page', async () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo');
+    renderApp(await seeded());
+    await screen.findByText('Alpha');
+    scrollTo.mockClear();
+    window.location.hash = '#/title/movie/1';
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 0));
+    scrollTo.mockRestore();
   });
 
   it('shows the empty state', async () => {
